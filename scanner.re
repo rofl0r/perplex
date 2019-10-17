@@ -127,7 +127,7 @@ buf_prints(struct Buf *buf, const char *fmt, const char *s)
 {
     char *t;
 
-    t = (char*)malloc(strlen(fmt) + strlen(s) + 1);
+    t = malloc(strlen(fmt) + strlen(s) + 1);
     sprintf(t, fmt, s);
     buf = buf_strappend(buf, t);
     free(t);
@@ -146,7 +146,7 @@ buf_linedir(struct Buf *buf, const char* filename, int lineno)
     char *t;
     const char fmt[] = "#line %d \"%s\"\n";
 
-    t = (char*)malloc(strlen(fmt) + strlen(filename) + (int)(1 + log10(lineno >= 0? lineno : -lineno)) + 1);
+    t = malloc(strlen(fmt) + strlen(filename) + (int)(1 + log10(lineno >= 0? lineno : -lineno)) + 1);
     sprintf(t, fmt, lineno, filename);
     buf = buf_strappend(buf, t);
     free(t);
@@ -398,7 +398,7 @@ getTokenText(perplex_t scanner)
 	free(scanner->tokenText);
     }
 
-    scanner->tokenText = (char*)malloc(sizeof(char) * (tokenChars + 1));
+    scanner->tokenText = malloc(sizeof(char) * (tokenChars + 1));
 
     memcpy(scanner->tokenText, scanner->tokenStart, tokenChars);
     scanner->tokenText[tokenChars] = '\0';
@@ -425,14 +425,14 @@ copyString(const char *str)
 
 static void
 copyTokenText(perplex_t scanner) {
-    scanner->appData->tokenData.string = (char*)copyString(yytext);
+    scanner->appData->tokenData.string = copyString(yytext);
 }
 
 static perplex_t
 newScanner()
 {
     perplex_t scanner;
-    scanner = (perplex_t)calloc(1, sizeof(struct perplex));
+    scanner = calloc(1, sizeof(struct perplex));
 
     return scanner;
 }
@@ -447,11 +447,11 @@ perplexFileScanner(FILE *input)
 
     scanner->inFile = input;
 
-    scanner->buffer = (struct Buf*)malloc(sizeof(struct Buf));
+    scanner->buffer = malloc(sizeof(struct Buf));
     buf_init(scanner->buffer, sizeof(char));
     buf_append_char(scanner->buffer, '\0');
 
-    bufFirst = (char*)scanner->buffer->elts;
+    bufFirst = scanner->buffer->elts;
     scanner->null = scanner->marker = scanner->cursor = bufFirst;
 
     return scanner;
