@@ -74,8 +74,6 @@ struct Buf *buf_strappend(struct Buf *, const char *str);
 struct Buf *buf_strnappend(struct Buf *, const char *str, int nchars);
 struct Buf *buf_strdefine(struct Buf * buf, const char *str, const char *def);
 struct Buf *buf_prints(struct Buf *buf, const char *fmt, const char* s);
-struct Buf *buf_m4_define(struct Buf *buf, const char* def, const char* val);
-struct Buf *buf_m4_undefine(struct Buf *buf, const char* def);
 struct Buf *buf_print_strings(struct Buf * buf, FILE* out);
 struct Buf *buf_linedir(struct Buf *buf, const char* filename, int lineno);
 
@@ -198,44 +196,6 @@ buf_strdefine(struct Buf *buf, const char *str, const char *def)
     buf_strappend(buf, " ");
     buf_strappend(buf, def);
     buf_strappend(buf, "\n");
-    return buf;
-}
-
-/** Pushes "m4_define( [[def]], [[val]])m4_dnl" to end of buffer.
- * @param buf A buffer as a list of strings.
- * @param def The m4 symbol to define.
- * @param val The definition; may be NULL.
- * @return buf
- */
-struct Buf*
-buf_m4_define(struct Buf *buf, const char* def, const char* val)
-{
-    const char *fmt = "m4_define( [[%s]], [[%s]])m4_dnl\n";
-    char *str;
-
-    val = val ? val : "";
-    str = (char*)malloc(strlen(fmt) + strlen(def) + strlen(val) + 2);
-
-    sprintf(str, fmt, def, val);
-    buf_append(buf, &str, 1);
-    return buf;
-}
-
-/** Pushes "m4_undefine([[def]])m4_dnl" to end of buffer.
- * @param buf A buffer as a list of strings.
- * @param def The m4 symbol to undefine.
- * @return buf
- */
-struct Buf*
-buf_m4_undefine(struct Buf *buf, const char* def)
-{
-    const char *fmt = "m4_undefine( [[%s]])m4_dnl\n";
-    char *str;
-
-    str = (char*)malloc(strlen(fmt) + strlen(def) + 2);
-
-    sprintf(str, fmt, def);
-    buf_append(buf, &str, 1);
     return buf;
 }
 
