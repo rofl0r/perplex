@@ -40,8 +40,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 #include "perplex.h"
-#include "mbo_getopt.h"
 
 /*
 Desired Features:
@@ -62,7 +62,7 @@ Desired Features:
 Possible Options (borrowed from flex usage message):
 -?
 -h,  --help		produce this help message
-     --header-file=FILE	create a C header file in addition to the scanner
+-i   --header=FILE	create a C header file in addition to the scanner
 -L,  --noline		suppress #line directives in scanner
 -o,  --outfile=FILE	specify output filename (stdout by default?)
 -P,  --prefix=STRING	use STRING as prefix instead of "yy"
@@ -71,19 +71,16 @@ Possible Options (borrowed from flex usage message):
      --yylineno		track line count in yylineno
 */
 
-using namespace re2c;
-
-static const mbo_opt_struct options[] =
+static const struct option options[] =
 {
-    mbo_opt_struct('?', 0, "help"),
-    mbo_opt_struct('h', 0, "help"),
-    mbo_opt_struct('c', 0, "conditions"),
-    mbo_opt_struct('i', 1, "header"),
-    mbo_opt_struct('o', 1, "output"),
-    mbo_opt_struct('s', 0, "safe-mode"),
-    mbo_opt_struct('t', 1, "template"),
-    mbo_opt_struct('v', 0, "version"),
-    mbo_opt_struct('-', 0, NULL)
+	{"header", required_argument, NULL, 'i'},
+	{"output", required_argument, NULL, 'o'},
+	{"template", required_argument, NULL, 't'},
+	{"conditions", no_argument, NULL, 'c'},
+	{"safe-mode", no_argument, NULL, 's'},
+	{"help", no_argument, NULL, 'h'},
+	{"version", no_argument, NULL, 'v'},
+	{ 0 }
 };
 
 static const char version[] = "1.0.1";
@@ -104,8 +101,7 @@ int main(int argc, char *argv[])
 {
     int c;
     int tokenID;
-    int opt_ind = 1;
-    char *opt_arg = NULL;
+    int opt_ind = 0;
     void *parser;
     perplex_t scanner;
     appData_t *appData;
@@ -122,32 +118,28 @@ int main(int argc, char *argv[])
 	return 0;
     }
 
-    while ((c = mbo_getopt(argc, argv, options, &opt_arg, &opt_ind, 0)) != -1) {
+    while ((c = getopt_long(argc, argv, "i:o:t:cshv", options, &opt_ind)) != -1) {
 	switch (c) {
-	    case '?':
-	    case 'h':
-		puts(usage);
-		return 0;
 	    case 'c':
 		usingConditions = 1;
 		break;
 	    case 'i':
-		if (opt_arg == NULL) {
+		if (optarg == NULL) {
 		    fprintf(stderr, "Error: Header option requires file-path argument.\n");
 		    exit(1);
 		}
-		if ((headerFile = fopen(opt_arg, "w")) == NULL) {
-		    fprintf(stderr, "Error: Couldn't open \"%s\" for writing.\n", opt_arg);
+		if ((headerFile = fopen(optarg, "w")) == NULL) {
+		    fprintf(stderr, "Error: Couldn't open \"%s\" for writing.\n", optarg);
 		    exit(1);
 		}
 		break;
 	    case 'o':
-		if (opt_arg == NULL) {
+		if (optarg == NULL) {
 		    fprintf(stderr, "Error: Output option requires file-path argument.\n");
 		    exit(1);
 		}
-		if ((outFile = fopen(opt_arg, "w")) == NULL) {
-		    fprintf(stderr, "Error: Couldn't open \"%s\" for writing.\n", opt_arg);
+		if ((outFile = fopen(optarg, "w")) == NULL) {
+		    fprintf(stderr, "Error: Couldn't open \"%s\" for writing.\n", optarg);
 		    exit(1);
 		}
 		break;
@@ -155,12 +147,12 @@ int main(int argc, char *argv[])
 		safeMode = 1;
 		break;
 	    case 't':
-		if (opt_arg == NULL) {
+		if (optarg == NULL) {
 		    fprintf(stderr, "Error: Template option requires file-path argument.\n");
 		    exit(1);
 		}
-		if ((templateFile = fopen(opt_arg, "r")) == NULL) {
-		    fprintf(stderr, "Error: Couldn't open \"%s\" for reading.\n", opt_arg);
+		if ((templateFile = fopen(optarg, "r")) == NULL) {
+		    fprintf(stderr, "Error: Couldn't open \"%s\" for reading.\n", optarg);
 		    exit(1);
 		}
 		break;
@@ -169,8 +161,9 @@ int main(int argc, char *argv[])
                 exit(0);
 	    default:
 		fprintf(stderr, "Error: Error in option string.\n");
+            case 'h':
 		puts(usage);
-		exit(1);
+		return 1;
 	}
     }
 
@@ -193,7 +186,7 @@ int main(int argc, char *argv[])
     scanner = perplexFileScanner(inFile);
     parser = ParseAlloc(malloc);
 
-    scanner->appData = static_cast<appData_t*>(malloc(sizeof(appData_t)));
+    scanner->appData = malloc(sizeof(appData_t));
     appData = scanner->appData;
     appData->in = inFile;
     appData->out = outFile;

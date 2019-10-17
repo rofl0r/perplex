@@ -6,12 +6,9 @@ generates an input for the re2c tool from a perplex input file.
 
 Main Sources
 -------------
-mbo_getopt.cpp and mbo_getopt.h
-    Option parser, taken from the re2c project.
-
-perplex.cpp
+perplex.c
     main for perplex.
-    
+
 scanner.re and parser.y
     Inputs for re2c scanner-generator and lemon parser-generator respectively.
     These files implement the perplex input file parser.
