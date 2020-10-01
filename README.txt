@@ -4,6 +4,12 @@
 Perplex is a simple tool to simplify the creation of scanners using re2c. It
 generates an input for the re2c tool from a perplex input file.
 
+This fork converted the sources from C++ to C, removed proprietary getopt code,
+replaced CMAKE with a Makefile and adds an example.
+The code derives from a US govt project called BRL-CAD, which can be found on
+sourceforge. a standalone, but outdated version of the code is available on
+https://github.com/stepcode/baffledCitrus.
+
 Main Sources
 -------------
 perplex.c
