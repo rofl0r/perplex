@@ -101,7 +101,6 @@ int main(int argc, char *argv[])
 {
     int c;
     int tokenID;
-    int opt_ind = 0;
     void *parser;
     perplex_t scanner;
     appData_t *appData;
@@ -118,7 +117,7 @@ int main(int argc, char *argv[])
 	return 0;
     }
 
-    while ((c = getopt_long(argc, argv, "i:o:t:cshv", options, &opt_ind)) != -1) {
+    while ((c = getopt_long(argc, argv, "i:o:t:cshv", options, 0)) != -1) {
 	switch (c) {
 	    case 'c':
 		usingConditions = 1;
@@ -177,8 +176,8 @@ int main(int argc, char *argv[])
 	}
     }
 
-    if ((inFile = fopen(argv[opt_ind], "r")) == NULL) {
-	fprintf(stderr, "Error: couldn't open input \"%s\" for reading\n", argv[opt_ind]);
+    if ((inFile = fopen(argv[optind], "r")) == NULL) {
+	fprintf(stderr, "Error: couldn't open input \"%s\" for reading\n", argv[optind]);
 	exit(1);
     }
 
