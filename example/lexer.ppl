@@ -1,0 +1,19 @@
+#define YYSTYPE long long int
+extern YYSTYPE yylval;
+#include "y.tab.h"
+#include "lexer.h"
+#include <stdlib.h>
+
+%%
+
+[\t ]+			{;}
+"Challenge: "		{;}
+[\n]			{ return 0; }
+[-]?[0-9]+		{ yylval = strtoll(yytext, 0, 10); return NUMBER; }
+[-+*]			{ return yytext[0]; }
+'('			{ return LPAREN; }
+')'			{ return RPAREN; }
+
+%%
+
+int yywrap() { return 1; }
