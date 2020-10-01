@@ -166,7 +166,6 @@ file ::= def_section rule_section code_section.
 def_section ::= string TOKEN_SEPARATOR.
 {
     writeDefinitions(appData);
-    fprintf(appData->out, "\n/* start rules */\n");
 }
 
 /* RULES SECTION */
